@@ -1,0 +1,82 @@
+###
+
+# curl --request GET
+#  --url http://localhost:8080/get_users
+GET http://localhost:8080/get_users
+
+###
+
+# curl --request POST
+#  --url http://localhost:8080/add_user
+#  --header 'Content-Type: multipart/form-data'
+#  --form 'data={	"name" : "Panictest1",	"num" : 43311334232372}'
+#  --form logo=@/Users/catharsis/Desktop/Megafon_logo.png
+POST http://localhost:8080/add_user
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="data"
+
+{	"name" : "Panictest1",	"num" : 43311334232372}
+--WebAppBoundary
+Content-Disposition: form-data; name="logo"; filename="Megafon_logo.png"
+
+< /Users/catharsis/Desktop/Megafon_logo.png
+--WebAppBoundary--
+
+###
+
+# curl --request POST
+#  --url http://localhost:8080/update_logo
+#  --header 'Content-Type: application/json'
+#  --data '{
+#	"id" : "372a33bf-c3b9-4258-b5d2-3a21396f9157",
+#	"logo" : "Tcellis"
+#}'
+POST http://localhost:8080/update_logo
+Content-Type: application/json
+
+{
+  "id": "372a33bf-c3b9-4258-b5d2-3a21396f9157",
+  "logo": "Tcellis"
+}
+
+###
+
+# curl --request POST
+#  --url http://localhost:8080/change_status
+#  --header 'Content-Type: application/json'
+#  --data '{
+#	"id" : "e2b166dc-dbd8-46d3-bc3f-bbe3099d71ff",
+#	"active" : false
+#}'
+POST http://localhost:8080/change_status
+Content-Type: application/json
+
+{
+  "id": "e2b166dc-dbd8-46d3-bc3f-bbe3099d71ff",
+  "active": false
+}
+
+###
+
+# curl --request POST
+#  --url http://localhost:8080/update_logo_multi
+#  --header 'Content-Type: multipart/form-data'
+#  --form 'data={"id" : "28f77b41-1c50-43b2-87af-5fdb048e9b82"}'
+#  --form logo=@/Users/catharsis/Desktop/Megafon_logo.png
+POST http://localhost:8080/update_logo_multi
+Content-Type: multipart/form-data; boundary=WebAppBoundary
+
+--WebAppBoundary
+Content-Disposition: form-data; name="data"
+
+{"id" : "28f77b41-1c50-43b2-87af-5fdb048e9b82"}
+--WebAppBoundary
+Content-Disposition: form-data; name="logo"; filename="Megafon_logo.png"
+
+< /Users/catharsis/Desktop/Megafon_logo.png
+--WebAppBoundary--
+
+###
+
