@@ -6,12 +6,14 @@ import (
 	"LogoForCardsGin/internal/repository"
 	"LogoForCardsGin/internal/server"
 	"LogoForCardsGin/internal/services"
+	logging "LogoForCardsGin/logger"
 	"github.com/gin-gonic/gin"
 	"log"
 	"net"
 )
 
 func main() {
+	logger := logging.GetLogger()
 	route := gin.Default()
 	config, err := config.GetConfig()
 	if err != nil {
@@ -20,9 +22,9 @@ func main() {
 	}
 	DB := db.GetDbConnection()
 
-	newRepository := repository.NewRepository(DB)
-	newService := services.NewServices(newRepository)
-	newServer := server.NewHandler(route, newService)
+	newRepository := repository.NewRepository(DB, logger)
+	newService := services.NewServices(newRepository, logger)
+	newServer := server.NewHandler(route, newService, logger)
 
 	newServer.Init()
 

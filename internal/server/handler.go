@@ -1,9 +1,9 @@
 package server
 
 import (
+	"LogoForCardsGin/internal/repository"
 	"LogoForCardsGin/internal/services"
 	logging "LogoForCardsGin/logger"
-	"LogoForCardsGin/models"
 	"context"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
@@ -11,19 +11,19 @@ import (
 	"net/http"
 )
 
-var Logger = logging.GetLogger()
+//var Logger = logging.GetLogger()
 
 type Handler struct {
 	Engine   *gin.Engine
 	Services *services.Services
-	//Logger *logging.Logger
+	Logger   logging.Logger
 }
 
-func NewHandler(engine *gin.Engine, services *services.Services) *Handler {
+func NewHandler(engine *gin.Engine, services *services.Services, Logger logging.Logger) *Handler {
 	return &Handler{
 		Engine:   engine,
 		Services: services,
-		//Logger: logger,
+		Logger:   Logger,
 	}
 }
 
@@ -41,12 +41,12 @@ func (h *Handler) Init() {
 
 func (h *Handler) GetUsers(ctx *gin.Context) {
 	//var users []*models.UserCards
-	
-	var context *context.Context
+	context := context.Background()
+	//var context context.Context
 	user, err := h.Services.GetUsers(context)
 	if err != nil {
-		Logger.Errorf("%s in GetUsers(server)", err)
-
+		h.Logger.Errorf("%s in GetUsers(server)", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	//w := cfx.Writer
@@ -74,8 +74,8 @@ func (h *Handler) GetUsers(ctx *gin.Context) {
 }
 
 func (h *Handler) AddUser(ctx *gin.Context) {
-	var context *context.Context
-	var userData models.UserCards
+	context := context.Background()
+	var userData UserCards
 
 	request := ctx.Request
 	formValue := request.FormValue("data")
@@ -83,12 +83,14 @@ func (h *Handler) AddUser(ctx *gin.Context) {
 
 	err := json.Unmarshal([]byte(formValue), &userData)
 	if err != nil {
-		Logger.Errorf("%s in AddUser(server)", err)
+		h.Logger.Errorf("%s in AddUser(server)", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	file, err := ctx.FormFile("logo")
 	if err != nil {
-		Logger.Errorf("%s - error in FormFile - logo?", err)
+		h.Logger.Errorf("%s - error in FormFile - logo?", err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 	//Logger.Println(file.Filename)
@@ -97,14 +99,14 @@ func (h *Handler) AddUser(ctx *gin.Context) {
 
 	err = ctx.SaveUploadedFile(file, userData.Logo)
 	if err != nil {
-		Logger.Println(err, "error in context.SaveUploadedFile")
+		h.Logger.Println(err, "error in context.SaveUploadedFile")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	err = h.Services.AddUser(context, &userData)
+	err = h.Services.AddUser(context, (*repository.UserCards)(&userData))
 	if err != nil {
-		Logger.Println(err)
+		h.Logger.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -114,18 +116,18 @@ func (h *Handler) AddUser(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateLogoJson(ctx *gin.Context) {
-	var context *context.Context
+	context := context.Background()
 
-	var userData *models.UserCards
+	var userData *UserCards
 
 	if err := ctx.ShouldBindJSON(&userData); err != nil {
-		Logger.Println(err, "test")
+		h.Logger.Println(err, "test")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
-	err := h.Services.UpdateUserLogoJson(context, userData)
+	err := h.Services.UpdateUserLogoJson(context, (*repository.UserCards)(userData))
 	if err != nil {
-		Logger.Println(err)
+		h.Logger.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -133,9 +135,9 @@ func (h *Handler) UpdateLogoJson(ctx *gin.Context) {
 }
 
 func (h *Handler) UpdateLogoMultipart(ctx *gin.Context) {
-	var context *context.Context
+	context := context.Background()
 
-	var userData models.UserCards
+	var userData UserCards
 
 	request := ctx.Request
 	formValue := request.FormValue("data")
@@ -143,7 +145,8 @@ func (h *Handler) UpdateLogoMultipart(ctx *gin.Context) {
 
 	err := json.Unmarshal([]byte(formValue), &userData)
 	if err != nil {
-		log.Println(err)
+		h.Logger.Println(err)
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 
 	}
@@ -157,16 +160,16 @@ func (h *Handler) UpdateLogoMultipart(ctx *gin.Context) {
 
 	userData.Logo = "./logotypes/" + file.Filename
 
-	err = h.Services.UpdateUserLogoJson(context, &userData)
+	err = h.Services.UpdateUserLogoJson(context, (*repository.UserCards)(&userData))
 	if err != nil {
-		Logger.Println(err)
+		h.Logger.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
 	err = ctx.SaveUploadedFile(file, userData.Logo)
 	if err != nil {
-		Logger.Println(err, "error in context.SaveUploadedFile")
+		h.Logger.Println(err, "error in context.SaveUploadedFile")
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
@@ -176,19 +179,19 @@ func (h *Handler) UpdateLogoMultipart(ctx *gin.Context) {
 }
 
 func (h *Handler) ChangeStatus(ctx *gin.Context) {
-	var context *context.Context
+	context := context.Background()
 
-	var userData models.UserCards
+	var userData UserCards
 
 	if err := ctx.ShouldBindJSON(&userData); err != nil {
-		Logger.Println(err)
+		h.Logger.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
 
-	err := h.Services.ChangeStatus(context, &userData)
+	err := h.Services.ChangeStatus(context, (*repository.UserCards)(&userData))
 	if err != nil {
-		Logger.Println(err)
+		h.Logger.Println(err)
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err})
 		return
 	}
