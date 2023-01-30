@@ -130,3 +130,6 @@ time="2023-01-29T21:28:33+05:00" level=info msg="context.Background.WithDeadline
 time="2023-01-29T21:28:33+05:00" level=info msg="AddUser complete" func="LogoForCardsGin/internal/repository.(*Repository).AddUser.func1()" file="repository.go:49"
 time="2023-01-29T21:28:36+05:00" level=info msg="context.Background.WithDeadline(2023-01-29 21:28:36.576158 +0500 +05 m=+18.079871459 [199.97425ms]) 0x104970a60" func="LogoForCardsGin/internal/repository.(*Repository).GetUser()" file="repository.go:31"
 time="2023-01-29T21:28:36+05:00" level=info msg="GetUser complete" func="LogoForCardsGin/internal/repository.(*Repository).GetUser.func1()" file="repository.go:33"
+time="2023-01-30T13:59:35+05:00" level=info msg="Success connection to localhost" func="LogoForCardsGin/internal/db.GetDbConnection()" file="db.go:49"
+time="2023-01-30T14:00:45+05:00" level=info msg="context.Background.WithDeadline(2023-01-30 14:00:46.166285 +0500 +05 m=+70.754778668 [199.972209ms]) 0x1010c8a60" func="LogoForCardsGin/internal/repository.(*Repository).AddUser()" file="repository.go:47"
+time="2023-01-30T14:00:45+05:00" level=info msg="AddUser complete" func="LogoForCardsGin/internal/repository.(*Repository).AddUser.func1()" file="repository.go:49"

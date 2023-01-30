@@ -8,7 +8,9 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"log"
+	"math/rand"
 	"net/http"
+	"strconv"
 )
 
 //var Logger = logging.GetLogger()
@@ -94,8 +96,10 @@ func (h *Handler) AddUser(ctx *gin.Context) {
 		return
 	}
 	//Logger.Println(file.Filename)
+	randomise := rand.Intn(111111)
+	randomiserString := strconv.Itoa(randomise)
 
-	userData.Logo = "./logotypes/" + file.Filename
+	userData.Logo = "./logotypes/" + randomiserString + file.Filename
 
 	err = ctx.SaveUploadedFile(file, userData.Logo)
 	if err != nil {
